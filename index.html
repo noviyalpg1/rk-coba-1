@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Komunitas - Media Pembelajaran</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            500: '#ef4444', 
+                            600: '#dc2626',
+                            700: '#b91c1c', 
+                            800: '#991b1b',
+                            900: '#7f1d1d',
+                        },
+                        secondary: '#ffffff',
+                        dark: '#0f172a',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #b91c1c; }
+        .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(220, 38, 38, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* Loading Spinner */
+        .loader { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #dc2626; width: 30px; height: 30px; -webkit-animation: spin 1s linear infinite; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-gray-50 selection:bg-primary-600 selection:text-white overflow-x-hidden flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 glass-nav py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-10">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="switchView('home')">
+                    <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary-500/30">R</div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">Ruang <span class="text-primary-600">Komunitas</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#" onclick="switchView('home')" class="text-gray-600 hover:text-primary-600 font-medium transition duration-300">Beranda</a>
+                    <a href="#services" onclick="navigateToSection('services')" class="text-gray-600 hover:text-primary-600 font-medium transition duration-300">Program Belajar</a>
+                    <a href="#contributors" onclick="navigateToSection('contributors')" class="text-gray-600 hover:text-primary-600 font-medium transition duration-300">Kontributor</a>
+                    <!-- Tombol Admin (Memicu Modal) -->
+                    <button onclick="checkAdminAccess()" class="px-5 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-700 transition duration-300 text-sm flex items-center gap-2 shadow-md">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-primary-600 focus:outline-none"><i class="fas fa-bars text-2xl"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white border-t border-gray-100 shadow-xl">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <a href="#" onclick="switchView('home')" class="block px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md">Beranda</a>
+                <a href="#services" onclick="navigateToSection('services')" class="block px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md">Program Belajar</a>
+                <a href="#contributors" onclick="navigateToSection('contributors')" class="block px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-md">Kontributor</a>
+                <a href="#" onclick="checkAdminAccess()" class="block px-3 py-3 text-base font-bold text-primary-600 bg-primary-50 rounded-md">Admin Panel</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow pt-20">
+        
+        <!-- HOME VIEW -->
+        <div id="view-home" class="view-section block animate-slide-up">
+            <section class="relative pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden">
+                <div class="absolute top-0 right-0 -z-10 w-1/2 h-full bg-gradient-to-bl from-primary-50 to-transparent opacity-60 rounded-bl-full"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <div class="text-center lg:text-left">
+                            <div class="inline-flex items-center px-3 py-1 rounded-full border border-primary-200 bg-primary-50 text-primary-600 text-sm font-semibold mb-6">
+                                <span class="flex h-2 w-2 rounded-full bg-primary-600 mr-2"></span>Ruang Digital Terpopuler #1
+                            </div>
+                            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">Bangun Ruang Digital yang <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800">Bermakna & Menyenangkan</span></h1>
+                            <p class="text-lg text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">Kami membantu guru-guru mengoptimalkan layanan digital yang berdampak nyata.</p>
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                                <a href="#services" class="px-8 py-4 bg-primary-600 text-white font-bold rounded-lg hover:bg-primary-700 transition duration-300 shadow-lg shadow-primary-600/30">Mulai Belajar</a>
+                            </div>
+                        </div>
+                        <div class="relative lg:h-auto flex justify-center animate-float">
+                            <div class="relative w-full max-w-md aspect-square bg-white rounded-2xl shadow-2xl border border-gray-100 flex items-center justify-center overflow-hidden">
+                                <div class="absolute top-0 w-full h-2 bg-gradient-to-r from-primary-500 to-primary-700"></div>
+                                <i class="fas fa-graduation-cap text-9xl text-primary-100"></i>
+                                <div class="absolute bottom-10 px-6 py-3 bg-white/80 backdrop-blur rounded-lg shadow-lg border border-gray-100 flex items-center gap-3">
+                                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div><span class="font-bold text-gray-800">Kelas Aktif</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SERVICES SECTION -->
+            <section id="services" class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <span class="text-primary-600 font-bold tracking-wider uppercase text-sm">Program Belajar</span>
+                        <h2 class="mt-2 text-3xl md:text-4xl font-extrabold text-gray-900">Mata Pelajaran Unggulan</h2>
+                        <p class="mt-4 text-gray-500">Klik salah satu mata pelajaran untuk masuk ke ruang kelas digital.</p>
+                        <div class="w-20 h-1 bg-primary-600 mx-auto mt-4 rounded-full"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                        <!-- Kartu Mata Pelajaran -->
+                        <div onclick="openSubject('Matematika')" class="cursor-pointer group p-8 bg-gray-50 rounded-2xl hover:bg-white border border-transparent hover:border-primary-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 text-2xl mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"><i class="fas fa-calculator"></i></div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Matematika</h3><p class="text-gray-600 text-sm">Materi hitungan dan logika.</p>
+                        </div>
+                        <div onclick="openSubject('Bahasa Indonesia')" class="cursor-pointer group p-8 bg-gray-50 rounded-2xl hover:bg-white border border-transparent hover:border-primary-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 text-2xl mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"><i class="fas fa-book-open"></i></div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Bahasa Indonesia</h3><p class="text-gray-600 text-sm">Literasi dan tata bahasa.</p>
+                        </div>
+                        <div onclick="openSubject('Bahasa Inggris')" class="cursor-pointer group p-8 bg-gray-50 rounded-2xl hover:bg-white border border-transparent hover:border-primary-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 text-2xl mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"><i class="fas fa-language"></i></div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Bahasa Inggris</h3><p class="text-gray-600 text-sm">English Conversation & Grammar.</p>
+                        </div>
+                        <div onclick="openSubject('IPA')" class="cursor-pointer group p-8 bg-gray-50 rounded-2xl hover:bg-white border border-transparent hover:border-primary-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 text-2xl mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"><i class="fas fa-flask"></i></div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">IPA (Sains)</h3><p class="text-gray-600 text-sm">Eksperimen dan pengetahuan alam.</p>
+                        </div>
+                        <div onclick="openSubject('IPAS')" class="cursor-pointer group p-8 bg-gray-50 rounded-2xl hover:bg-white border border-transparent hover:border-primary-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 text-2xl mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"><i class="fas fa-leaf"></i></div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">IPAS</h3><p class="text-gray-600 text-sm">Ilmu Pengetahuan Alam & Sosial.</p>
+                        </div>
+                        <div onclick="openSubject('TIK')" class="cursor-pointer group p-8 bg-gray-50 rounded-2xl hover:bg-white border border-transparent hover:border-primary-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-300 transform hover:-translate-y-1">
+                            <div class="w-14 h-14 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 text-2xl mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300"><i class="fas fa-desktop"></i></div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">TIK</h3><p class="text-gray-600 text-sm">Laboratorium komputer.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-primary-50 rounded-xl p-8 text-center border border-primary-100">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Jelajahi Pelajaran Lainnya</h3>
+                        <div class="flex flex-wrap justify-center gap-3">
+                            <button onclick="openSubject('Pendidikan Agama')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">Pendidikan Agama</button>
+                            <button onclick="openSubject('Pendidikan Pancasila')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">Pendidikan Pancasila</button>
+                            <button onclick="openSubject('IPS')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">IPS</button>
+                            <button onclick="openSubject('Seni/Budaya')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">Seni/Budaya</button>
+                            <button onclick="openSubject('PJOK')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">PJOK</button>
+                            <button onclick="openSubject('Bahasa Lampung')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">Bahasa Lampung</button>
+                            <button onclick="openSubject('Lainnya')" class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-primary-600 hover:text-white hover:border-primary-600 transition font-medium">Lainnya</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KONTRIBUTOR SECTION -->
+            <section id="contributors" class="py-20 bg-gray-50 border-t border-gray-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <span class="text-primary-600 font-bold tracking-wider uppercase text-sm">Tim Kami</span>
+                        <h2 class="mt-2 text-3xl md:text-4xl font-extrabold text-gray-900">Kontributor Ruang Komunitas</h2>
+                        <p class="mt-4 text-gray-500">Dedikasi para pendidik dan praktisi untuk kemajuan pendidikan digital.</p>
+                        <div class="w-20 h-1 bg-primary-600 mx-auto mt-4 rounded-full"></div>
+                    </div>
+
+                    <!-- Dynamic Contributors List -->
+                    <div id="contributors-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <!-- Content will be injected via JS -->
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SUBJECT VIEW -->
+        <div id="view-subject" class="view-section hidden min-h-screen bg-gray-50">
+            <div class="bg-primary-600 text-white pt-10 pb-20 rounded-b-[3rem] shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                <div class="max-w-7xl mx-auto px-4 relative z-10">
+                    <button onclick="closeSubject()" class="mb-6 flex items-center gap-2 text-primary-100 hover:text-white transition cursor-pointer"><i class="fas fa-arrow-left"></i> Kembali ke Program Belajar</button>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div>
+                            <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide">Ruang Kelas Digital</span>
+                            <h1 id="subject-title" class="text-4xl md:text-5xl font-extrabold mt-2">Nama Pelajaran</h1>
+                            <p class="text-primary-100 mt-2 text-lg">Kumpulan materi ajar digital terkini.</p>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/20">
+                            <div class="text-center"><p class="text-3xl font-bold" id="subject-count">0</p><p class="text-xs text-primary-100">Materi Tersedia</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 -mt-10 pb-20 relative z-20">
+                <!-- Loading State -->
+                <div id="loading-subject" class="hidden text-center py-10 bg-white rounded-xl shadow-sm">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="loader mb-4"></div>
+                        <p class="text-gray-500">Memuat materi...</p>
+                    </div>
+                </div>
+
+                <div id="subject-content-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="empty-state" class="hidden text-center py-20">
+                    <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400 text-3xl"><i class="fas fa-folder-open"></i></div>
+                    <h3 class="text-xl font-bold text-gray-600">Belum ada materi</h3>
+                    <p class="text-gray-500">Hubungi Admin untuk menambahkan materi.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN MODAL POPUP -->
+        <div id="admin-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <!-- Background Backdrop -->
+            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" aria-hidden="true" onclick="closeAdminModal()"></div>
+
+                <!-- Modal Panel -->
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-gray-50 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl w-full">
+                    
+                    <!-- Modal Header -->
+                    <div class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-xl font-bold flex items-center gap-2">
+                            <i class="fas fa-user-shield text-primary-500"></i> Admin Panel
+                        </h3>
+                        <button type="button" class="text-gray-400 hover:text-white focus:outline-none" onclick="closeAdminModal()">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body (Tabs & Content) -->
+                    <div class="p-6 md:p-8 max-h-[80vh] overflow-y-auto">
+                        
+                        <!-- Tab Navigation -->
+                        <div class="flex flex-wrap gap-4 mb-8 border-b border-gray-200 pb-4">
+                            <button onclick="switchAdminTab('media')" id="tab-media" class="flex-1 sm:flex-none px-6 py-3 rounded-xl font-bold transition bg-primary-600 text-white shadow-lg flex items-center justify-center gap-2">
+                                <i class="fas fa-play-circle"></i> Kelola Media
+                            </button>
+                            <button onclick="switchAdminTab('kontributor')" id="tab-kontributor" class="flex-1 sm:flex-none px-6 py-3 rounded-xl font-bold transition bg-white text-gray-600 hover:bg-gray-200 flex items-center justify-center gap-2">
+                                <i class="fas fa-users"></i> Kelola Kontributor
+                            </button>
+                        </div>
+
+                        <!-- SECTION 1: MEDIA PEMBELAJARAN -->
+                        <div id="admin-media-section">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Kolom Input (Kiri) -->
+                                <div class="lg:col-span-1">
+                                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h4 id="form-header" class="font-bold text-gray-800 text-lg">Input Media</h4>
+                                            <button id="btn-cancel-edit" onclick="resetForm()" class="hidden text-xs text-red-600 font-bold hover:underline">Batal</button>
+                                        </div>
+                                        <form id="adminForm" onsubmit="handleAdminSubmit(event)" class="space-y-4">
+                                            <input type="hidden" id="input-id">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Judul Materi</label>
+                                                <input type="text" id="input-title" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm" placeholder="Contoh: Rumus Pythagoras">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Mata Pelajaran</label>
+                                                <select id="input-subject" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm bg-white">
+                                                    <option value="Matematika">Matematika</option>
+                                                    <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                                    <option value="Bahasa Inggris">Bahasa Inggris</option>
+                                                    <option value="IPA">IPA (Sains)</option>
+                                                    <option value="IPAS">IPAS</option>
+                                                    <option value="IPS">IPS</option>
+                                                    <option value="Pendidikan Agama">Pendidikan Agama</option>
+                                                    <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                                                    <option value="Seni/Budaya">Seni/Budaya</option>
+                                                    <option value="PJOK">PJOK</option>
+                                                    <option value="Bahasa Lampung">Bahasa Lampung</option>
+                                                    <option value="TIK">TIK</option>
+                                                    <option value="Lainnya">Lainnya</option>
+                                                </select>
+                                            </div>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-xs font-bold text-gray-600 mb-1">Kelas</label>
+                                                    <select id="input-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm bg-white">
+                                                        <option value="1">Kelas 1</option>
+                                                        <option value="2">Kelas 2</option>
+                                                        <option value="3">Kelas 3</option>
+                                                        <option value="4">Kelas 4</option>
+                                                        <option value="5">Kelas 5</option>
+                                                        <option value="6">Kelas 6</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-bold text-gray-600 mb-1">Rating</label>
+                                                    <select id="input-rating" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm bg-white">
+                                                        <option value="5">⭐⭐⭐⭐⭐</option>
+                                                        <option value="4">⭐⭐⭐⭐</option>
+                                                        <option value="3">⭐⭐⭐</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Tipe Media</label>
+                                                <select id="input-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm bg-white">
+                                                    <option value="Video Pembelajaran">Video Pembelajaran</option>
+                                                    <option value="Artikel">Artikel</option>
+                                                    <option value="Media Pembelajaran">Media Pembelajaran</option>
+                                                    <option value="E-Book">Buku Digital / PDF</option>
+                                                    <option value="Kuis">Kuis Interaktif</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Link Materi</label>
+                                                <input type="url" id="input-link" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm" placeholder="https://..." value="https://google.com">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Deskripsi</label>
+                                                <textarea id="input-desc" rows="2" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm" placeholder="Deskripsi singkat..."></textarea>
+                                            </div>
+                                            <button id="btn-submit" type="submit" class="w-full py-2 bg-primary-600 text-white font-bold rounded-lg hover:bg-primary-700 shadow-md transition text-sm">
+                                                Simpan Media
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Kolom Daftar (Kanan) -->
+                                <div class="lg:col-span-2">
+                                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full flex flex-col">
+                                        <h4 class="font-bold text-gray-800 text-lg mb-4">Daftar Media Pembelajaran</h4>
+                                        <div class="flex-grow overflow-y-auto max-h-[500px] pr-2">
+                                            <div id="admin-data-list" class="space-y-3">
+                                                <!-- List Item Generated Here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: KONTRIBUTOR -->
+                        <div id="admin-kontributor-section" class="hidden">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Input Kontributor -->
+                                <div class="lg:col-span-1">
+                                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                                        <div class="flex justify-between items-center mb-4">
+                                            <h4 class="font-bold text-gray-800 text-lg">Input Kontributor</h4>
+                                            <button id="btn-cancel-kontributor" onclick="resetKontributorForm()" class="hidden text-xs text-red-600 font-bold hover:underline">Batal</button>
+                                        </div>
+                                        <form id="kontributorForm" onsubmit="handleKontributorSubmit(event)" class="space-y-4">
+                                            <input type="hidden" id="kontributor-id">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap</label>
+                                                <input type="text" id="kontributor-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm" placeholder="Budi Santoso">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Jabatan / Role</label>
+                                                <input type="text" id="kontributor-role" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm" placeholder="Guru Kelas 1">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Inisial (2 Huruf)</label>
+                                                <input type="text" id="kontributor-initials" required maxlength="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm uppercase" placeholder="BS">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-600 mb-1">Deskripsi Singkat</label>
+                                                <textarea id="kontributor-desc" rows="2" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none text-sm" placeholder="Spesialis multimedia..."></textarea>
+                                            </div>
+                                            <button id="btn-submit-kontributor" type="submit" class="w-full py-2 bg-gray-800 text-white font-bold rounded-lg hover:bg-gray-900 shadow-md transition text-sm">
+                                                Simpan Kontributor
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Daftar Kontributor -->
+                                <div class="lg:col-span-2">
+                                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 h-full flex flex-col">
+                                        <h4 class="font-bold text-gray-800 text-lg mb-4">Daftar Kontributor Terdaftar</h4>
+                                        <div class="flex-grow overflow-y-auto max-h-[500px] pr-2">
+                                            <div id="admin-kontributor-list" class="space-y-3">
+                                                <!-- List Item Generated Here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 text-white pt-10 pb-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center"><p class="text-gray-500 text-sm">&copy; 2024 Ruang Komunitas. Developed for Education.</p></div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-[100] transform transition-all duration-300 translate-x-full opacity-0">
+        <div class="bg-white border-l-4 border-primary-600 rounded shadow-2xl p-4 flex items-start gap-3 min-w-[300px]">
+            <div class="flex-shrink-0 text-primary-600 mt-0.5"><i class="fas fa-check-circle text-xl"></i></div>
+            <div class="flex-1"><h3 id="toast-title" class="font-bold text-gray-900 text-sm">Berhasil!</h3><p id="toast-message" class="text-sm text-gray-600 mt-1">Data disimpan.</p></div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. CONFIGURATION ---
+        const API_URL = ""; 
+
+        // Local State Media
+        let mediaDatabase = [
+            { id: 1, title: "Aljabar Dasar", subject: "Matematika", type: "Media Pembelajaran", classGrade: "4", rating: 5, link: "https://youtube.com", desc: "Pengenalan variabel dan konstanta.", date: "12 Okt 2023" },
+            { id: 2, title: "Puisi Lama", subject: "Bahasa Indonesia", type: "E-Book", classGrade: "5", rating: 4, link: "https://google.com", desc: "Kumpulan pantun dan gurindam.", date: "15 Okt 2023" },
+            { id: 3, title: "Teknik Passing", subject: "PJOK", type: "Video Pembelajaran", classGrade: "6", rating: 5, link: "https://youtube.com", desc: "Teknik dasar passing bola basket.", date: "20 Okt 2023" },
+            { id: 4, title: "Rantai Makanan", subject: "IPAS", type: "Kuis", classGrade: "4", rating: 4, link: "https://google.com", desc: "Latihan soal tentang rantai makanan.", date: "22 Okt 2023" },
+            { id: 5, title: "Aksara Lampung", subject: "Bahasa Lampung", type: "Artikel", classGrade: "3", rating: 5, link: "https://google.com", desc: "Mengenal induk huruf.", date: "25 Okt 2023" }
+        ];
+
+        // Local State Kontributor
+        let contributorDatabase = [
+            { id: 101, name: "Agus Setiawan", role: "Kepala Sekolah", initials: "AS", desc: "Penanggung jawab utama program digitalisasi sekolah." },
+            { id: 102, name: "Rina Larasati", role: "Guru Penggerak", initials: "RL", desc: "Koordinator materi Bahasa dan Literasi digital." },
+            { id: 103, name: "Budi Pratama", role: "Tim IT & Developer", initials: "BP", desc: "Pengembang sistem dan pemeliharaan server." },
+            { id: 104, name: "Siti Nurhaliza", role: "Guru Kelas 1", initials: "SN", desc: "Kreator konten pembelajaran interaktif multimedia." }
+        ];
+        
+        let isEditing = false;
+        let isEditingKontributor = false;
+        let isDataLoaded = false;
+
+        // --- 2. DATA FETCHING (API) ---
+        async function fetchData() {
+            isDataLoaded = true;
+            renderPublicContributors(); 
+        }
+
+        // --- 3. ADMIN AUTH & MODAL ---
+        function checkAdminAccess() {
+            const password = prompt("Masukkan Kata Sandi Admin:", "");
+            if (password === "rahasia") {
+                openAdminModal();
+            } else if (password !== null) {
+                alert("Kata sandi salah! Akses ditolak.");
+            }
+        }
+
+        function openAdminModal() {
+            const modal = document.getElementById('admin-modal');
+            modal.classList.remove('hidden');
+            
+            // Initialize Modal State
+            resetForm();
+            resetKontributorForm();
+            renderAdminList();
+            renderAdminContributorList();
+            switchAdminTab('media'); // Default tab
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        // --- 4. NAVIGATION & TABS ---
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`view-${viewName}`);
+            if(target) {
+                target.classList.remove('hidden');
+                if(viewName !== 'home' || !window.isClosingSubject) window.scrollTo(0,0);
+            }
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function switchAdminTab(tab) {
+            const mediaSec = document.getElementById('admin-media-section');
+            const kontriSec = document.getElementById('admin-kontributor-section');
+            const tabMedia = document.getElementById('tab-media');
+            const tabKontri = document.getElementById('tab-kontributor');
+
+            if (tab === 'media') {
+                mediaSec.classList.remove('hidden');
+                kontriSec.classList.add('hidden');
+                tabMedia.classList.replace('bg-white', 'bg-primary-600');
+                tabMedia.classList.replace('text-gray-600', 'text-white');
+                tabKontri.classList.replace('bg-primary-600', 'bg-white');
+                tabKontri.classList.replace('text-white', 'text-gray-600');
+            } else {
+                mediaSec.classList.add('hidden');
+                kontriSec.classList.remove('hidden');
+                tabKontri.classList.replace('bg-white', 'bg-primary-600');
+                tabKontri.classList.replace('text-gray-600', 'text-white');
+                tabMedia.classList.replace('bg-primary-600', 'bg-white');
+                tabMedia.classList.replace('text-white', 'text-gray-600');
+            }
+        }
+        
+        function navigateToSection(sectionId) {
+            if (document.getElementById('view-home').classList.contains('hidden')) {
+                window.isClosingSubject = true; 
+                switchView('home');
+            }
+            setTimeout(() => {
+                const section = document.getElementById(sectionId);
+                if(section) section.scrollIntoView({ behavior: 'smooth' });
+                window.isClosingSubject = false;
+            }, 100);
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function closeSubject() {
+            window.isClosingSubject = true;
+            switchView('home');
+            setTimeout(() => {
+                const servicesSection = document.getElementById('services');
+                if(servicesSection) servicesSection.scrollIntoView({ behavior: 'smooth' });
+                window.isClosingSubject = false;
+            }, 50);
+        }
+
+        // --- 5. RENDER LOGIC (PUBLIC) ---
+        function openSubject(subjectName) {
+            document.getElementById('subject-title').innerText = subjectName;
+            const grid = document.getElementById('subject-content-grid');
+            const emptyState = document.getElementById('empty-state');
+            const loading = document.getElementById('loading-subject');
+            const countLabel = document.getElementById('subject-count');
+            
+            grid.innerHTML = '';
+            emptyState.classList.add('hidden');
+            loading.classList.remove('hidden');
+            switchView('subject');
+
+            setTimeout(() => {
+                const filteredData = mediaDatabase.filter(item => item.subject === subjectName);
+                loading.classList.add('hidden');
+                countLabel.innerText = filteredData.length;
+                
+                if (filteredData.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    filteredData.forEach(item => {
+                        let iconClass = 'fa-file-alt';
+                        let colorClass = 'bg-blue-100 text-blue-600';
+                        if(item.type === 'Video Pembelajaran') { iconClass = 'fa-play-circle'; colorClass = 'bg-red-100 text-red-600'; }
+                        if(item.type === 'Media Pembelajaran') { iconClass = 'fa-layer-group'; colorClass = 'bg-orange-100 text-orange-600'; }
+                        if(item.type === 'E-Book') { iconClass = 'fa-book'; colorClass = 'bg-green-100 text-green-600'; }
+                        if(item.type === 'Kuis') { iconClass = 'fa-question'; colorClass = 'bg-purple-100 text-purple-600'; }
+                        if(item.type === 'Artikel') { iconClass = 'fa-newspaper'; colorClass = 'bg-teal-100 text-teal-600'; }
+
+                        let starHtml = '';
+                        for(let i=0; i < parseInt(item.rating); i++) starHtml += '<i class="fas fa-star text-yellow-400 text-[10px] mr-0.5"></i>';
+
+                        const card = `
+                            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition duration-300 group flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="w-10 h-10 rounded-lg ${colorClass} flex items-center justify-center"><i class="fas ${iconClass}"></i></div>
+                                    <div class="text-right">
+                                        <span class="block text-xs font-bold text-primary-600 bg-primary-50 px-2 py-1 rounded mb-1">Kelas ${item.classGrade}</span>
+                                        <span class="text-xs text-gray-400">${item.type}</span>
+                                    </div>
+                                </div>
+                                <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition leading-tight">${item.title}</h3>
+                                <p class="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">${item.desc}</p>
+                                <div class="mt-auto">
+                                    <div class="flex items-center mb-4">${starHtml}<span class="text-xs text-gray-400 ml-2">(${item.rating}.0)</span></div>
+                                    <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                                        <span class="text-xs text-gray-400"><i class="far fa-calendar mr-1"></i> ${item.date}</span>
+                                        <a href="${item.link}" target="_blank" class="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-full hover:bg-primary-600 transition flex items-center gap-2">Buka Materi <i class="fas fa-external-link-alt"></i></a>
+                                    </div>
+                                </div>
+                            </div>`;
+                        grid.innerHTML += card;
+                    });
+                }
+            }, 300);
+        }
+
+        function renderPublicContributors() {
+            const container = document.getElementById('contributors-grid');
+            container.innerHTML = '';
+            
+            contributorDatabase.forEach(person => {
+                const card = `
+                    <div class="bg-white rounded-2xl shadow-md p-6 text-center hover:shadow-xl transition duration-300 border border-transparent hover:border-primary-200 group">
+                        <div class="w-24 h-24 mx-auto bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-4 shadow-lg group-hover:scale-110 transition duration-300">
+                            ${person.initials}
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">${person.name}</h3>
+                        <p class="text-sm text-primary-600 font-semibold mb-2">${person.role}</p>
+                        <p class="text-xs text-gray-500 mb-4 line-clamp-2">${person.desc}</p>
+                    </div>`;
+                container.innerHTML += card;
+            });
+        }
+
+        // --- 6. ADMIN LOGIC (MEDIA) ---
+        function resetForm() {
+            isEditing = false;
+            document.getElementById('adminForm').reset();
+            document.getElementById('input-id').value = '';
+            document.getElementById('form-header').innerText = "Input Media";
+            document.getElementById('btn-submit').innerText = 'Simpan Media';
+            document.getElementById('btn-cancel-edit').classList.add('hidden');
+            document.getElementById('input-link').value = 'https://google.com';
+        }
+
+        function editItem(id) {
+            const item = mediaDatabase.find(x => x.id == id);
+            if(item) {
+                isEditing = true;
+                document.getElementById('input-id').value = item.id;
+                document.getElementById('input-title').value = item.title;
+                document.getElementById('input-subject').value = item.subject;
+                document.getElementById('input-class').value = item.classGrade;
+                document.getElementById('input-type').value = item.type;
+                document.getElementById('input-rating').value = item.rating;
+                document.getElementById('input-link').value = item.link;
+                document.getElementById('input-desc').value = item.desc;
+                document.getElementById('form-header').innerText = "Edit: " + item.title;
+                document.getElementById('btn-submit').innerText = 'Perbarui';
+                document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            }
+        }
+
+        function handleAdminSubmit(e) {
+            e.preventDefault();
+            const payload = {
+                id: document.getElementById('input-id').value || Date.now(),
+                title: document.getElementById('input-title').value,
+                subject: document.getElementById('input-subject').value,
+                classGrade: document.getElementById('input-class').value,
+                type: document.getElementById('input-type').value,
+                rating: document.getElementById('input-rating').value,
+                link: document.getElementById('input-link').value,
+                desc: document.getElementById('input-desc').value,
+                date: new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})
+            };
+
+            if (isEditing) {
+                const index = mediaDatabase.findIndex(x => x.id == payload.id);
+                if(index !== -1) mediaDatabase[index] = payload;
+                showToast("Berhasil", "Data media diperbarui.");
+            } else {
+                mediaDatabase.push(payload);
+                showToast("Berhasil", "Data media ditambahkan.");
+            }
+            resetForm();
+            renderAdminList();
+        }
+
+        function renderAdminList() {
+            const listContainer = document.getElementById('admin-data-list');
+            listContainer.innerHTML = '';
+            [...mediaDatabase].reverse().forEach(item => {
+                const itemHtml = `
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex flex-col gap-2 hover:bg-gray-100 transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-bold text-gray-800 text-sm line-clamp-1">${item.title}</p>
+                                <p class="text-xs text-gray-500">${item.subject} • Kls ${item.classGrade}</p>
+                            </div>
+                            <span class="text-xs bg-white border px-2 py-0.5 rounded text-primary-600 font-bold">${item.type.split(' ')[0]}</span>
+                        </div>
+                        <div class="flex gap-2 justify-end mt-1">
+                            <button onclick="editItem(${item.id})" class="text-yellow-600 hover:text-yellow-700 text-xs px-2 py-1 rounded border border-yellow-200 bg-white hover:bg-yellow-50"><i class="fas fa-edit"></i> Edit</button>
+                            <button onclick="deleteItem(${item.id})" class="text-red-600 hover:text-red-700 text-xs px-2 py-1 rounded border border-red-200 bg-white hover:bg-red-50"><i class="fas fa-trash"></i> Hapus</button>
+                        </div>
+                    </div>`;
+                listContainer.innerHTML += itemHtml;
+            });
+        }
+
+        function deleteItem(id) {
+            if(confirm('Hapus media ini?')) {
+                mediaDatabase = mediaDatabase.filter(item => item.id != id);
+                renderAdminList();
+                showToast("Terhapus", "Data media dihapus.");
+            }
+        }
+
+        // --- 7. ADMIN LOGIC (KONTRIBUTOR) ---
+        function resetKontributorForm() {
+            isEditingKontributor = false;
+            document.getElementById('kontributorForm').reset();
+            document.getElementById('kontributor-id').value = '';
+            document.getElementById('btn-submit-kontributor').innerText = 'Simpan Kontributor';
+            document.getElementById('btn-cancel-kontributor').classList.add('hidden');
+        }
+
+        function handleKontributorSubmit(e) {
+            e.preventDefault();
+            const payload = {
+                id: document.getElementById('kontributor-id').value || Date.now(),
+                name: document.getElementById('kontributor-name').value,
+                role: document.getElementById('kontributor-role').value,
+                initials: document.getElementById('kontributor-initials').value.toUpperCase(),
+                desc: document.getElementById('kontributor-desc').value
+            };
+
+            if (isEditingKontributor) {
+                const index = contributorDatabase.findIndex(x => x.id == payload.id);
+                if(index !== -1) contributorDatabase[index] = payload;
+                showToast("Berhasil", "Data kontributor diperbarui.");
+            } else {
+                contributorDatabase.push(payload);
+                showToast("Berhasil", "Kontributor ditambahkan.");
+            }
+            resetKontributorForm();
+            renderAdminContributorList();
+            renderPublicContributors(); 
+        }
+
+        function renderAdminContributorList() {
+            const listContainer = document.getElementById('admin-kontributor-list');
+            listContainer.innerHTML = '';
+            contributorDatabase.forEach(person => {
+                const itemHtml = `
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 flex items-center justify-between gap-3 hover:bg-gray-100 transition">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex-shrink-0 flex items-center justify-center font-bold text-xs border border-primary-200">${person.initials}</div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-800 text-sm truncate">${person.name}</p>
+                                <p class="text-xs text-gray-500 truncate">${person.role}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            <button onclick="editKontributor(${person.id})" class="text-yellow-600 hover:text-yellow-700 text-xs px-2 py-1 rounded border border-yellow-200 bg-white hover:bg-yellow-50"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteKontributor(${person.id})" class="text-red-600 hover:text-red-700 text-xs px-2 py-1 rounded border border-red-200 bg-white hover:bg-red-50"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                listContainer.innerHTML += itemHtml;
+            });
+        }
+
+        function editKontributor(id) {
+            const person = contributorDatabase.find(x => x.id == id);
+            if(person) {
+                isEditingKontributor = true;
+                document.getElementById('kontributor-id').value = person.id;
+                document.getElementById('kontributor-name').value = person.name;
+                document.getElementById('kontributor-role').value = person.role;
+                document.getElementById('kontributor-initials').value = person.initials;
+                document.getElementById('kontributor-desc').value = person.desc;
+                
+                document.getElementById('btn-submit-kontributor').innerText = 'Perbarui';
+                document.getElementById('btn-cancel-kontributor').classList.remove('hidden');
+            }
+        }
+
+        function deleteKontributor(id) {
+            if(confirm('Hapus kontributor ini?')) {
+                contributorDatabase = contributorDatabase.filter(x => x.id != id);
+                renderAdminContributorList();
+                renderPublicContributors();
+                showToast("Terhapus", "Kontributor dihapus.");
+            }
+        }
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 3000);
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+        window.addEventListener('load', () => {
+            document.querySelector('.animate-slide-up')?.classList.add('active');
+            fetchData(); 
+        });
+    </script>
+</body>
+</html>
